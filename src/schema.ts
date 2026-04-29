@@ -64,7 +64,7 @@ export const VisionSchema = z.object({
     .boolean()
     .optional()
     .describe("If true, overlay numbered boxes on interactive elements before screenshotting (requires a prior snapshot)."),
-  model: z.string().optional().describe("Override the Anthropic vision model."),
+  model: z.string().optional().describe("Override the vision model. Default: moonshotai/Kimi-K2.5."),
   task_id: taskId,
 });
 
@@ -162,7 +162,7 @@ export const TOOL_SPECS: ToolSpec[] = [
   {
     name: "browser_vision",
     description:
-      "Take a full-page screenshot of the current page and ask a Claude vision model a question about it. Useful for understanding visual layout, captchas, and content not exposed in the accessibility tree. Requires ANTHROPIC_API_KEY.",
+      "Take a full-page screenshot of the current page and ask a vision model a question about it. Useful for understanding visual layout, captchas, and content not exposed in the accessibility tree. Configurable via BROWSER_TOOL_VISION_BASE_URL.",
     inputSchema: VisionSchema,
     handler: adapt(VisionSchema, (a) =>
       browserVision({

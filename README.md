@@ -57,8 +57,8 @@ Registers 10 tools, each accepting an optional `task_id` argument so a single se
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | (none) | Required for `browser_vision` |
-| `BROWSER_TOOL_VISION_MODEL` | `claude-haiku-4-5-20251001` | Override vision model |
+| `BROWSER_TOOL_VISION_BASE_URL` | `http://localhost:4000/flex/v1` | Base URL for vision API (Anthropic-compatible). |
+| `BROWSER_TOOL_VISION_MODEL` | `moonshotai/Kimi-K2.5` | Override vision model |
 | `BROWSER_TOOL_CACHE_DIR` | `~/.cache/browser-tool` | Where screenshots live |
 | `BROWSER_INACTIVITY_TIMEOUT` | `300` (seconds) | Idle session reaper threshold |
 | `BROWSER_TOOL_HEADLESS` | `1` | Set `0` to launch headed (debugging) |
@@ -69,14 +69,14 @@ Registers 10 tools, each accepting an optional `task_id` argument so a single se
 ```bash
 bun run typecheck     # tsc --noEmit
 bun test              # all integration tests against real Chromium
-bun run eval          # 8-step end-to-end PASS/FAIL (last step calls real Anthropic API)
+bun run eval          # 8-step end-to-end PASS/FAIL (last step calls vision API)
 ```
 
 ## Limitations
 
 - v1: top frame only (no iframe traversal).
 - v1: single Chromium instance per process; sessions isolated by `BrowserContext`.
-- Vision requires `ANTHROPIC_API_KEY`; absent → graceful error response.
+- Vision routes through a configurable Anthropic-compatible endpoint; no API key needed on localhost.
 
 ## Detailed docs
 

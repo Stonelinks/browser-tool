@@ -133,14 +133,8 @@ steps.push({
 });
 
 steps.push({
-  name: "8. vision (real Anthropic call)",
+  name: "8. vision (live API call)",
   run: async () => {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return {
-        ok: false,
-        detail: "ANTHROPIC_API_KEY not set; cannot perform live vision check",
-      };
-    }
     const res = await browserVision({
       question:
         "Look at the page. Does it contain text indicating a search was performed for 'hello'? Reply 'yes' or 'no' followed by a one-sentence explanation.",

@@ -21,16 +21,11 @@ export interface AnalyzeFailure {
 export type AnalyzeResult = AnalyzeSuccess | AnalyzeFailure;
 
 export async function analyzeScreenshot(opts: AnalyzeOptions): Promise<AnalyzeResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return {
-      success: false,
-      error: "ANTHROPIC_API_KEY not set; browser_vision is unavailable.",
-    };
-  }
   const cfg = getConfig();
+  // SDK requires a non-empty apiKey string; the local proxy needs no real key.
+  const apiKey = process.env.BROWSER_TOOL_API_KEY ?? process.env.ANTHROPIC_API_KEY ?? "local-proxy";
   const model = opts.model ?? cfg.visionModel;
-  const client = new Anthropic({ apiKey });
+  const client = new Anthropic({ apiKey, baseURL: cfg.visionBaseUrl });
   let b64: string;
   try {
     const data = await Bun.file(opts.pngPath).arrayBuffer();
@@ -65,6 +60,6 @@ export async function analyzeScreenshot(opts: AnalyzeOptions): Promise<AnalyzeRe
       .join("\n");
     return { success: true, analysis: text, model };
   } catch (err) {
-    return { success: false, error: `Anthropic API call failed: ${(err as Error).message}` };
+    return { success: false, error: `Vision API call failed: ${(err as Error).message}` };
   }
 }

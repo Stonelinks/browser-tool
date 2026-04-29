@@ -19,7 +19,7 @@ This is the guide for **consumers** of `browser-tool`: agents, scripts, or human
 | `browser_press` | Press a key (Enter, Tab, Escape, etc.). |
 | `browser_console` | Read accumulated logs/errors, or evaluate a JS expression. |
 | `browser_get_images` | List `<img>` URLs on the page. |
-| `browser_vision` | Screenshot the page and ask Claude a vision question about it. |
+| `browser_vision` | Screenshot the page and ask a vision model a question about it. |
 
 It is **not** a general scraping library, a stealth browser, or a multi-frame DOM toolkit. v1 inspects the top frame only and runs a single shared Chromium process.
 
@@ -43,7 +43,7 @@ bun install
 bunx playwright install chromium    # ~170 MB, one-time
 ```
 
-If you want the `vision` action, set `ANTHROPIC_API_KEY` (e.g. in a `.env` file at the project root — Bun auto-loads it).
+If you want the `vision` action, make sure an Anthropic-compatible API is reachable at `http://localhost:4000` (or configure `BROWSER_TOOL_VISION_BASE_URL`).
 
 ---
 
@@ -184,9 +184,9 @@ const res = await browserVision({
 });
 ```
 
-It takes a full-page screenshot, sends it to Claude Haiku 4.5 (default) along with your question, and returns the analysis text plus the screenshot path. Set `annotate: true` to overlay numbered red boxes on every `[data-agent-ref]` element before screenshotting (run a snapshot first to populate refs).
+It takes a full-page screenshot, sends it to the configured vision model (default: `moonshotai/Kimi-K2.5`) along with your question, and returns the analysis text plus the screenshot path. Set `annotate: true` to overlay numbered red boxes on every `[data-agent-ref]` element before screenshotting (run a snapshot first to populate refs).
 
-Requires `ANTHROPIC_API_KEY`. If unset, the action returns a clean error instead of throwing.
+No API key is needed when the endpoint doesn't require authentication (e.g. localhost). Set `ANTHROPIC_API_KEY` or `BROWSER_TOOL_API_KEY` if the endpoint requires auth.
 
 ---
 
@@ -264,12 +264,12 @@ if (v.success) console.log(v.analysis);
 
 ## Configuration
 
-`.env` is auto-loaded by Bun. All variables are optional except `ANTHROPIC_API_KEY` (required for `browser_vision`).
+`.env` is auto-loaded by Bun. All variables are optional.
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | (none) | Required for `browser_vision`. |
-| `BROWSER_TOOL_VISION_MODEL` | `claude-haiku-4-5-20251001` | Override the vision model. |
+| `BROWSER_TOOL_VISION_BASE_URL` | `http://localhost:4000/flex/v1` | Base URL for the vision API (Anthropic Messages API compatible). Change the path prefix to switch completion windows (e.g. `/asap/v1`, `/standard/v1`, `/priority/v1`). |
+| `BROWSER_TOOL_VISION_MODEL` | `moonshotai/Kimi-K2.5` | Override the vision model. |
 | `BROWSER_TOOL_CACHE_DIR` | `~/.cache/browser-tool` | Where screenshots and runtime artifacts live. |
 | `BROWSER_INACTIVITY_TIMEOUT` | `300` (seconds) | Idle session reaper threshold. |
 | `BROWSER_REAPER_INTERVAL` | `30` (seconds) | How often the reaper checks. |
@@ -285,7 +285,7 @@ if (v.success) console.log(v.analysis);
 - **Top frame only.** Iframes are walked into during snapshot generation but their elements are not currently tagged with refs. If you need to interact with iframe content, this isn't supported in v1.
 - **One Chromium process per Bun/Node process.** Many sessions share one browser. If Chromium dies, all sessions die with it.
 - **No persistent profiles.** Every session is ephemeral. Cookies/storage do not survive `closeAll()`.
-- **Vision requires `ANTHROPIC_API_KEY`.** No graceful fallback to other vision providers.
+- **Vision uses an Anthropic-compatible API endpoint.** No API key needed when the endpoint doesn't require auth (e.g. localhost).
 - **Snapshot refs are recreated on every snapshot.** `@e3` from the snapshot you took two minutes ago is meaningless after the next snapshot — *always* use refs from the most recent snapshot.
 
 ---
@@ -298,6 +298,6 @@ if (v.success) console.log(v.analysis);
 
 **Chromium fails to launch** — make sure you ran `bunx playwright install chromium`. On Linux with limited `/dev/shm`, the launch flags include `--disable-dev-shm-usage`; if you've added other flags, that may conflict.
 
-**Vision returns "ANTHROPIC_API_KEY not set"** — set it in `.env` at the project root or export it in the shell.
+**Vision call fails with connection error** — make sure an Anthropic-compatible API is reachable at `BROWSER_TOOL_VISION_BASE_URL` (default `http://localhost:4000/flex/v1`).
 
 **Sessions don't close on Ctrl-C in the MCP server** — they should; lifecycle handlers register `SIGINT`/`SIGTERM`. If your client wraps the server, make sure the wrapper forwards signals.

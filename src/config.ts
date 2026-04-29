@@ -8,6 +8,7 @@ export interface Config {
   cacheDir: string;
   screenshotDir: string;
   visionModel: string;
+  visionBaseUrl: string;
   defaultTaskId: string;
   commandTimeoutMs: number;
   maxSnapshotChars: number;
@@ -38,7 +39,8 @@ export function getConfig(): Config {
     reaperIntervalMs: envInt("BROWSER_REAPER_INTERVAL", 30) * 1000,
     cacheDir,
     screenshotDir: join(cacheDir, "screenshots"),
-    visionModel: process.env.BROWSER_TOOL_VISION_MODEL ?? "claude-haiku-4-5-20251001",
+    visionModel: process.env.BROWSER_TOOL_VISION_MODEL ?? "moonshotai/Kimi-K2.5",
+    visionBaseUrl: process.env.BROWSER_TOOL_VISION_BASE_URL ?? "http://localhost:4000/flex/v1",
     defaultTaskId: "default",
     commandTimeoutMs: envInt("BROWSER_COMMAND_TIMEOUT", 30) * 1000,
     maxSnapshotChars: envInt("BROWSER_MAX_SNAPSHOT_CHARS", 8000),
