@@ -1,0 +1,27 @@
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Node / Bun
+node_modules/
+dist/
+*.tsbuildinfo
+
+# Playwright cache (browser binaries are large; keep out of repo)
+.cache/
+
+# OS / editor
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Browser-tool runtime
+.browser-tool-cache/
+screenshots/
