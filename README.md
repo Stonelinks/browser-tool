@@ -57,7 +57,7 @@ Registers 10 tools, each accepting an optional `task_id` argument so a single se
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `BROWSER_TOOL_VISION_BASE_URL` | `http://localhost:4000/flex/v1` | Base URL for vision API (Anthropic-compatible). |
+| `BROWSER_TOOL_VISION_BASE_URL` | `http://localhost:4000/flex` | Base URL for vision API (Anthropic SDK appends `/v1/messages`). |
 | `BROWSER_TOOL_VISION_MODEL` | `moonshotai/Kimi-K2.5` | Override vision model |
 | `BROWSER_TOOL_CACHE_DIR` | `~/.cache/browser-tool` | Where screenshots live |
 | `BROWSER_INACTIVITY_TIMEOUT` | `300` (seconds) | Idle session reaper threshold |
@@ -67,10 +67,15 @@ Registers 10 tools, each accepting an optional `task_id` argument so a single se
 ## Development
 
 ```bash
-bun run typecheck     # tsc --noEmit
-bun test              # all integration tests against real Chromium
-bun run eval          # 8-step end-to-end PASS/FAIL (last step calls vision API)
+source env.sh           # sets up PATH so bin/* scripts are available
+check                  # runs format + typecheck + test + integration tests
+format                 # format TS and shell files
+typecheck              # tsc --noEmit
+test                   # bun test (unit tests)
+test-integration       # exercises library, CLI, and MCP entrypoints
 ```
+
+Prefer `bin/*` scripts over `bun run` npm scripts. See [`docs/developers.md`](./docs/developers.md) for details.
 
 ## Limitations
 

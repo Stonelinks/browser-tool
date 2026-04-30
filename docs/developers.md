@@ -379,16 +379,18 @@ This is the user's hard requirement before declaring the project shippable. Run 
 bun install
 bunx playwright install chromium
 
-# Iterate
-bun run typecheck                  # tsc --noEmit
-bun run test                       # all tests, ~6s
-bun test --timeout 30000 --parallel test/snapshot.test.ts   # one file
-bun run eval                       # end-to-end, includes live Anthropic call
+# First time in a shell: activate bin scripts
+source env.sh
 
-# Smoke
-bun run cli navigate --url https://example.com
-bun run mcp                        # then send JSON-RPC over stdin
+# Iterate
+check                  # format + typecheck + test + integration tests
+format                 # format TS and shell files
+typecheck              # tsc --noEmit
+test                   # bun test (unit tests)
+test-integration       # exercises library, CLI, and MCP entrypoints
 ```
+
+**Prefer `bin/*` scripts over `bun run` npm scripts.** The `env.sh` file adds `bin/` to your `PATH` so you can call `check`, `format`, `typecheck`, `test`, and `test-integration` directly. This is the canonical way to run checks — do not use `bun run typecheck` etc.
 
 ### Debugging
 
