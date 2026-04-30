@@ -20,6 +20,7 @@
     "eval": "bun run eval/e2e.ts",
     "mcp": "bun run src/mcp/server.ts",
     "cli": "bun run src/cli/main.ts",
+    "daemon": "bun run src/daemon.ts",
     "typecheck": "tsc --noEmit",
     "install-chromium": "bunx playwright install chromium"
   },
