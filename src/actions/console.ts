@@ -1,5 +1,9 @@
 import { withSession, failure, errorMessage } from "./_helpers.js";
-import type { ActionResult, ConsoleBuffersResult, ConsoleEvalResult } from "../types.js";
+import type {
+  ActionResult,
+  ConsoleBuffersResult,
+  ConsoleEvalResult,
+} from "../types.js";
 
 export interface ConsoleInput {
   clear?: boolean;

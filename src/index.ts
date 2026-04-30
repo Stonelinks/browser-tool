@@ -13,7 +13,12 @@ export { SessionManager } from "./session/manager.js";
 export { Session } from "./session/session.js";
 export { registerLifecycleHandlers } from "./session/lifecycle.js";
 export { getConfig, resetConfig, type Config } from "./config.js";
-export { TOOL_SPECS, findSpec, type ToolSpec, type ToolHandler } from "./schema.js";
+export {
+  TOOL_SPECS,
+  findSpec,
+  type ToolSpec,
+  type ToolHandler,
+} from "./schema.js";
 
 export type {
   ActionResult,

@@ -21,7 +21,9 @@ const ACTION_TO_TOOL: Record<string, string> = {
 
 function printUsage(): void {
   const lines: string[] = [];
-  lines.push("Usage: browser-tool <action> [--task-id ID] [--<arg> <value> ...]");
+  lines.push(
+    "Usage: browser-tool <action> [--task-id ID] [--<arg> <value> ...]",
+  );
   lines.push("");
   lines.push("Actions:");
   for (const [verb, name] of Object.entries(ACTION_TO_TOOL)) {
@@ -32,7 +34,9 @@ function printUsage(): void {
   }
   lines.push("");
   lines.push("Common flags:");
-  lines.push("  --task-id ID       Isolate this session from others (default 'default').");
+  lines.push(
+    "  --task-id ID       Isolate this session from others (default 'default').",
+  );
   lines.push("  --json-pretty      Pretty-print the JSON result.");
   lines.push("  --help             Show this message.");
   process.stderr.write(lines.join("\n") + "\n");
@@ -41,7 +45,11 @@ function printUsage(): void {
 function coerceArg(schema: z.ZodTypeAny, raw: string | boolean): unknown {
   if (typeof raw === "boolean") return raw;
   // Try to peek inner type for booleans / numbers.
-  const def = (schema as unknown as { _def?: { typeName?: string; innerType?: z.ZodTypeAny } })._def;
+  const def = (
+    schema as unknown as {
+      _def?: { typeName?: string; innerType?: z.ZodTypeAny };
+    }
+  )._def;
   let inner: z.ZodTypeAny | undefined = schema;
   if (def?.innerType) inner = def.innerType;
   const innerDef = (inner as unknown as { _def?: { typeName?: string } })._def;
@@ -80,7 +88,10 @@ async function main(): Promise<void> {
 
   // Build options dynamically from schema shape.
   const shape = (spec.inputSchema as z.ZodObject<z.ZodRawShape>).shape;
-  const options: Record<string, { type: "string" | "boolean"; short?: string }> = {
+  const options: Record<
+    string,
+    { type: "string" | "boolean"; short?: string }
+  > = {
     "task-id": { type: "string" },
     "json-pretty": { type: "boolean" },
     help: { type: "boolean", short: "h" },
@@ -88,14 +99,23 @@ async function main(): Promise<void> {
   for (const [key, valSchema] of Object.entries(shape)) {
     const flagName = key.replace(/_/g, "-");
     if (flagName === "task-id") continue;
-    const def = (valSchema as unknown as { _def?: { typeName?: string; innerType?: z.ZodTypeAny } })._def;
+    const def = (
+      valSchema as unknown as {
+        _def?: { typeName?: string; innerType?: z.ZodTypeAny };
+      }
+    )._def;
     let inner: z.ZodTypeAny = valSchema as z.ZodTypeAny;
     if (def?.innerType) inner = def.innerType;
-    const innerTn = (inner as unknown as { _def?: { typeName?: string } })._def?.typeName;
-    options[flagName] = innerTn === "ZodBoolean" ? { type: "boolean" } : { type: "string" };
+    const innerTn = (inner as unknown as { _def?: { typeName?: string } })._def
+      ?.typeName;
+    options[flagName] =
+      innerTn === "ZodBoolean" ? { type: "boolean" } : { type: "string" };
   }
 
-  let parsed: { values: Record<string, string | boolean | undefined>; positionals: string[] };
+  let parsed: {
+    values: Record<string, string | boolean | undefined>;
+    positionals: string[];
+  };
   try {
     parsed = parseArgs({
       args: argv.slice(1),
@@ -108,8 +128,11 @@ async function main(): Promise<void> {
     process.exit(2);
   }
   if (parsed.values.help) {
-    process.stderr.write(`Action: ${verb} (${toolName})\n${spec.description}\n\nFlags:\n`);
-    for (const flag of Object.keys(options)) process.stderr.write(`  --${flag}\n`);
+    process.stderr.write(
+      `Action: ${verb} (${toolName})\n${spec.description}\n\nFlags:\n`,
+    );
+    for (const flag of Object.keys(options))
+      process.stderr.write(`  --${flag}\n`);
     process.exit(0);
   }
 
@@ -128,7 +151,11 @@ async function main(): Promise<void> {
   if (parsed.positionals.length > 0) {
     const requiredString = Object.entries(shape).find(([k, v]) => {
       if (k === "task_id") return false;
-      const tn = (v as unknown as { _def?: { typeName?: string; innerType?: z.ZodTypeAny } })._def?.typeName;
+      const tn = (
+        v as unknown as {
+          _def?: { typeName?: string; innerType?: z.ZodTypeAny };
+        }
+      )._def?.typeName;
       return tn === "ZodString" && args[k] === undefined;
     });
     if (requiredString) {
@@ -147,7 +174,9 @@ async function main(): Promise<void> {
     if (!result.success) exitCode = 1;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    process.stdout.write(JSON.stringify({ success: false, error: message }) + "\n");
+    process.stdout.write(
+      JSON.stringify({ success: false, error: message }) + "\n",
+    );
     exitCode = 1;
   } finally {
     await SessionManager.getInstance().closeAll();

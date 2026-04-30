@@ -15,11 +15,19 @@ export interface BuildSnapshotResult {
   title: string;
 }
 
-export async function buildSnapshot(page: Page, opts: BuildSnapshotOptions = {}): Promise<BuildSnapshotResult> {
+export async function buildSnapshot(
+  page: Page,
+  opts: BuildSnapshotOptions = {},
+): Promise<BuildSnapshotResult> {
   const compact = !opts.full;
   const cfg = getConfig();
-  const payload: SnapshotPayload = await page.evaluate(snapshotScript, { compact });
-  const { text, truncated } = truncateSnapshot(payload.text, cfg.maxSnapshotChars);
+  const payload: SnapshotPayload = await page.evaluate(snapshotScript, {
+    compact,
+  });
+  const { text, truncated } = truncateSnapshot(
+    payload.text,
+    cfg.maxSnapshotChars,
+  );
   return {
     text,
     refCount: payload.refCount,

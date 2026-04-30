@@ -22,7 +22,8 @@ async function pruneOldScreenshots(dir: string): Promise<void> {
     const now = Date.now();
     await Promise.all(
       entries.map(async (name) => {
-        if (!name.startsWith("browser_screenshot_") || !name.endsWith(".png")) return;
+        if (!name.startsWith("browser_screenshot_") || !name.endsWith(".png"))
+          return;
         const full = join(dir, name);
         try {
           const s = await stat(full);
@@ -37,7 +38,9 @@ async function pruneOldScreenshots(dir: string): Promise<void> {
   }
 }
 
-async function injectAnnotations(page: import("playwright-core").Page): Promise<void> {
+async function injectAnnotations(
+  page: import("playwright-core").Page,
+): Promise<void> {
   await page.evaluate(() => {
     const existing = document.getElementById("__bt_annotation_layer__");
     if (existing) existing.remove();
@@ -63,14 +66,18 @@ async function injectAnnotations(page: import("playwright-core").Page): Promise<
   });
 }
 
-async function removeAnnotations(page: import("playwright-core").Page): Promise<void> {
+async function removeAnnotations(
+  page: import("playwright-core").Page,
+): Promise<void> {
   await page.evaluate(() => {
     const existing = document.getElementById("__bt_annotation_layer__");
     if (existing) existing.remove();
   });
 }
 
-export async function browserVision(input: VisionInput): Promise<ActionResult<VisionResult>> {
+export async function browserVision(
+  input: VisionInput,
+): Promise<ActionResult<VisionResult>> {
   if (!input.question) return failure("question is required");
   const cfg = getConfig();
   return withSession(input.taskId, async (session) => {

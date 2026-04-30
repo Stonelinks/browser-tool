@@ -22,10 +22,9 @@ async function main(): Promise<void> {
     tools: TOOL_SPECS.map((s) => ({
       name: s.name,
       description: s.description,
-      inputSchema: zodToJsonSchema(s.inputSchema, { target: "jsonSchema7" }) as Record<
-        string,
-        unknown
-      >,
+      inputSchema: zodToJsonSchema(s.inputSchema, {
+        target: "jsonSchema7",
+      }) as Record<string, unknown>,
     })),
   }));
 
@@ -34,7 +33,13 @@ async function main(): Promise<void> {
     if (!spec) {
       return {
         content: [
-          { type: "text", text: JSON.stringify({ success: false, error: `Unknown tool: ${req.params.name}` }) },
+          {
+            type: "text",
+            text: JSON.stringify({
+              success: false,
+              error: `Unknown tool: ${req.params.name}`,
+            }),
+          },
         ],
         isError: true,
       };
@@ -48,7 +53,12 @@ async function main(): Promise<void> {
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       return {
-        content: [{ type: "text", text: JSON.stringify({ success: false, error: message }) }],
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify({ success: false, error: message }),
+          },
+        ],
         isError: true,
       };
     }

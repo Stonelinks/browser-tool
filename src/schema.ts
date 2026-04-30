@@ -14,61 +14,94 @@ import type { ActionResult } from "./types.js";
 const taskId = z
   .string()
   .optional()
-  .describe('Optional task ID to isolate this browser session from others. Defaults to "default".');
+  .describe(
+    'Optional task ID to isolate this browser session from others. Defaults to "default".',
+  );
 
 export const NavigateSchema = z.object({
-  url: z.string().describe("URL to navigate to. Will prepend https:// if missing."),
+  url: z
+    .string()
+    .describe("URL to navigate to. Will prepend https:// if missing."),
   task_id: taskId,
 });
 export const SnapshotSchema = z.object({
   full: z
     .boolean()
     .optional()
-    .describe("If true, include text/headings/paragraphs in addition to interactive elements."),
+    .describe(
+      "If true, include text/headings/paragraphs in addition to interactive elements.",
+    ),
   task_id: taskId,
 });
 export const ClickSchema = z.object({
-  ref: z.string().describe('Element reference like "@e5" from the latest snapshot.'),
+  ref: z
+    .string()
+    .describe('Element reference like "@e5" from the latest snapshot.'),
   task_id: taskId,
 });
 export const TypeSchema = z.object({
-  ref: z.string().describe('Element reference like "@e3" for the input/textarea to fill.'),
-  text: z.string().describe("Text to type into the field. Replaces existing value."),
+  ref: z
+    .string()
+    .describe('Element reference like "@e3" for the input/textarea to fill.'),
+  text: z
+    .string()
+    .describe("Text to type into the field. Replaces existing value."),
   submit: z.boolean().optional().describe("If true, press Enter after typing."),
   task_id: taskId,
 });
 export const ScrollSchema = z.object({
   direction: z.enum(["up", "down"]).describe("Scroll direction."),
-  pixels: z.number().int().positive().optional().describe("Pixels to scroll. Default 600."),
+  pixels: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe("Pixels to scroll. Default 600."),
   task_id: taskId,
 });
 export const BackSchema = z.object({ task_id: taskId });
 export const PressSchema = z.object({
   key: z
     .string()
-    .describe('Key name to press (Playwright format), e.g. "Enter", "Tab", "Escape", "Control+a".'),
+    .describe(
+      'Key name to press (Playwright format), e.g. "Enter", "Tab", "Escape", "Control+a".',
+    ),
   task_id: taskId,
 });
 export const ConsoleSchema = z.object({
-  clear: z.boolean().optional().describe("If true, clear the console buffers after returning them."),
+  clear: z
+    .boolean()
+    .optional()
+    .describe("If true, clear the console buffers after returning them."),
   expression: z
     .string()
     .optional()
-    .describe("Optional JavaScript expression to evaluate in the page context. If set, returns the result instead of buffered logs."),
+    .describe(
+      "Optional JavaScript expression to evaluate in the page context. If set, returns the result instead of buffered logs.",
+    ),
   task_id: taskId,
 });
 export const GetImagesSchema = z.object({ task_id: taskId });
 export const VisionSchema = z.object({
-  question: z.string().describe("Question to ask about the screenshot of the current page."),
+  question: z
+    .string()
+    .describe("Question to ask about the screenshot of the current page."),
   annotate: z
     .boolean()
     .optional()
-    .describe("If true, overlay numbered boxes on interactive elements before screenshotting (requires a prior snapshot)."),
-  model: z.string().optional().describe("Override the vision model. Default: moonshotai/Kimi-K2.5."),
+    .describe(
+      "If true, overlay numbered boxes on interactive elements before screenshotting (requires a prior snapshot).",
+    ),
+  model: z
+    .string()
+    .optional()
+    .describe("Override the vision model. Default: moonshotai/Kimi-K2.5."),
   task_id: taskId,
 });
 
-export type ToolHandler = (args: Record<string, unknown>) => Promise<ActionResult>;
+export type ToolHandler = (
+  args: Record<string, unknown>,
+) => Promise<ActionResult>;
 
 function adapt<T extends z.ZodTypeAny>(
   schema: T,
@@ -99,21 +132,27 @@ export const TOOL_SPECS: ToolSpec[] = [
     description:
       "Navigate the browser to a URL. Returns a compact accessibility-tree snapshot of the page with interactive elements tagged [ref @eN] for use with browser_click and browser_type.",
     inputSchema: NavigateSchema,
-    handler: adapt(NavigateSchema, (a) => browserNavigate({ url: a.url, taskId: a.task_id })),
+    handler: adapt(NavigateSchema, (a) =>
+      browserNavigate({ url: a.url, taskId: a.task_id }),
+    ),
   },
   {
     name: "browser_snapshot",
     description:
       "Re-read the current page and return an accessibility-tree snapshot. Required after the page changes (clicks, navigation, dynamic content) before referring to elements again. Set full=true for a verbose snapshot including headings and paragraphs.",
     inputSchema: SnapshotSchema,
-    handler: adapt(SnapshotSchema, (a) => browserSnapshot({ full: a.full, taskId: a.task_id })),
+    handler: adapt(SnapshotSchema, (a) =>
+      browserSnapshot({ full: a.full, taskId: a.task_id }),
+    ),
   },
   {
     name: "browser_click",
     description:
       'Click an element identified by a ref like "@e5" from the latest snapshot. The ref must come from a current snapshot — if the page has changed, call browser_snapshot first.',
     inputSchema: ClickSchema,
-    handler: adapt(ClickSchema, (a) => browserClick({ ref: a.ref, taskId: a.task_id })),
+    handler: adapt(ClickSchema, (a) =>
+      browserClick({ ref: a.ref, taskId: a.task_id }),
+    ),
   },
   {
     name: "browser_type",
@@ -121,15 +160,25 @@ export const TOOL_SPECS: ToolSpec[] = [
       'Type text into an input or textarea element identified by a ref like "@e3". Clears any existing value first. Set submit=true to press Enter after typing.',
     inputSchema: TypeSchema,
     handler: adapt(TypeSchema, (a) =>
-      browserType({ ref: a.ref, text: a.text, submit: a.submit, taskId: a.task_id }),
+      browserType({
+        ref: a.ref,
+        text: a.text,
+        submit: a.submit,
+        taskId: a.task_id,
+      }),
     ),
   },
   {
     name: "browser_scroll",
-    description: 'Scroll the viewport up or down by a number of pixels (default 600).',
+    description:
+      "Scroll the viewport up or down by a number of pixels (default 600).",
     inputSchema: ScrollSchema,
     handler: adapt(ScrollSchema, (a) =>
-      browserScroll({ direction: a.direction, pixels: a.pixels, taskId: a.task_id }),
+      browserScroll({
+        direction: a.direction,
+        pixels: a.pixels,
+        taskId: a.task_id,
+      }),
     ),
   },
   {
@@ -140,9 +189,12 @@ export const TOOL_SPECS: ToolSpec[] = [
   },
   {
     name: "browser_press",
-    description: 'Press a keyboard key (Playwright format), e.g. "Enter", "Tab", "Escape", "Control+a".',
+    description:
+      'Press a keyboard key (Playwright format), e.g. "Enter", "Tab", "Escape", "Control+a".',
     inputSchema: PressSchema,
-    handler: adapt(PressSchema, (a) => browserPress({ key: a.key, taskId: a.task_id })),
+    handler: adapt(PressSchema, (a) =>
+      browserPress({ key: a.key, taskId: a.task_id }),
+    ),
   },
   {
     name: "browser_console",
@@ -150,14 +202,21 @@ export const TOOL_SPECS: ToolSpec[] = [
       "Read accumulated browser console messages and JavaScript errors since the last call (or session start). Set clear=true to empty the buffers afterward. If expression is provided, evaluate it in the page context and return the result instead.",
     inputSchema: ConsoleSchema,
     handler: adapt(ConsoleSchema, (a) =>
-      browserConsole({ clear: a.clear, expression: a.expression, taskId: a.task_id }),
+      browserConsole({
+        clear: a.clear,
+        expression: a.expression,
+        taskId: a.task_id,
+      }),
     ),
   },
   {
     name: "browser_get_images",
-    description: "Return a list of <img> elements on the current page with src/alt/dimensions. Skips data: URLs.",
+    description:
+      "Return a list of <img> elements on the current page with src/alt/dimensions. Skips data: URLs.",
     inputSchema: GetImagesSchema,
-    handler: adapt(GetImagesSchema, (a) => browserGetImages({ taskId: a.task_id })),
+    handler: adapt(GetImagesSchema, (a) =>
+      browserGetImages({ taskId: a.task_id }),
+    ),
   },
   {
     name: "browser_vision",

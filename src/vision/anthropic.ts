@@ -20,10 +20,15 @@ export interface AnalyzeFailure {
 
 export type AnalyzeResult = AnalyzeSuccess | AnalyzeFailure;
 
-export async function analyzeScreenshot(opts: AnalyzeOptions): Promise<AnalyzeResult> {
+export async function analyzeScreenshot(
+  opts: AnalyzeOptions,
+): Promise<AnalyzeResult> {
   const cfg = getConfig();
   // SDK requires a non-empty apiKey string; the local proxy needs no real key.
-  const apiKey = process.env.BROWSER_TOOL_API_KEY ?? process.env.ANTHROPIC_API_KEY ?? "local-proxy";
+  const apiKey =
+    process.env.BROWSER_TOOL_API_KEY ??
+    process.env.ANTHROPIC_API_KEY ??
+    "local-proxy";
   const model = opts.model ?? cfg.visionModel;
   const client = new Anthropic({ apiKey, baseURL: cfg.visionBaseUrl });
   let b64: string;
@@ -31,7 +36,10 @@ export async function analyzeScreenshot(opts: AnalyzeOptions): Promise<AnalyzeRe
     const data = await Bun.file(opts.pngPath).arrayBuffer();
     b64 = Buffer.from(data).toString("base64");
   } catch (err) {
-    return { success: false, error: `failed to read screenshot: ${(err as Error).message}` };
+    return {
+      success: false,
+      error: `failed to read screenshot: ${(err as Error).message}`,
+    };
   }
   try {
     const resp = await client.messages.create({
@@ -60,6 +68,9 @@ export async function analyzeScreenshot(opts: AnalyzeOptions): Promise<AnalyzeRe
       .join("\n");
     return { success: true, analysis: text, model };
   } catch (err) {
-    return { success: false, error: `Vision API call failed: ${(err as Error).message}` };
+    return {
+      success: false,
+      error: `Vision API call failed: ${(err as Error).message}`,
+    };
   }
 }

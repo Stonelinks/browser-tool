@@ -7,7 +7,9 @@ export interface SnapshotInput {
   taskId?: string;
 }
 
-export async function browserSnapshot(input: SnapshotInput = {}): Promise<ActionResult<SnapshotResult>> {
+export async function browserSnapshot(
+  input: SnapshotInput = {},
+): Promise<ActionResult<SnapshotResult>> {
   return withSession(input.taskId, async (session) => {
     try {
       const snap = await buildSnapshot(session.page, { full: input.full });

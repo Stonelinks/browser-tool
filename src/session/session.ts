@@ -1,4 +1,8 @@
-import type { BrowserContext, Page, ConsoleMessage as PWConsoleMessage } from "playwright-core";
+import type {
+  BrowserContext,
+  Page,
+  ConsoleMessage as PWConsoleMessage,
+} from "playwright-core";
 import type { ConsoleMessage, JsError } from "../types.js";
 
 export class Session {
@@ -33,7 +37,9 @@ export class Session {
       this.consoleBuffer.push({
         type: msg.type(),
         text: msg.text(),
-        location: loc.url ? `${loc.url}:${loc.lineNumber}:${loc.columnNumber}` : undefined,
+        location: loc.url
+          ? `${loc.url}:${loc.lineNumber}:${loc.columnNumber}`
+          : undefined,
         timestamp: Date.now(),
       });
     });

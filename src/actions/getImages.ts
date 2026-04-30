@@ -20,8 +20,14 @@ export async function browserGetImages(
           out.push({
             src,
             alt: (img as HTMLImageElement).alt || "",
-            width: (img as HTMLImageElement).naturalWidth || (img as HTMLImageElement).width || 0,
-            height: (img as HTMLImageElement).naturalHeight || (img as HTMLImageElement).height || 0,
+            width:
+              (img as HTMLImageElement).naturalWidth ||
+              (img as HTMLImageElement).width ||
+              0,
+            height:
+              (img as HTMLImageElement).naturalHeight ||
+              (img as HTMLImageElement).height ||
+              0,
           });
         }
         return out;

@@ -8,11 +8,17 @@ export interface NavigateInput {
   taskId?: string;
 }
 
-export async function browserNavigate(input: NavigateInput): Promise<ActionResult<NavigateResult>> {
+export async function browserNavigate(
+  input: NavigateInput,
+): Promise<ActionResult<NavigateResult>> {
   const url = input.url?.trim();
   if (!url) return failure("url is required");
   let normalized = url;
-  if (!/^https?:\/\//i.test(normalized) && !normalized.startsWith("file://") && !normalized.startsWith("about:")) {
+  if (
+    !/^https?:\/\//i.test(normalized) &&
+    !normalized.startsWith("file://") &&
+    !normalized.startsWith("about:")
+  ) {
     normalized = `https://${normalized}`;
   }
   return withSession(input.taskId, async (session) => {

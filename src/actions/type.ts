@@ -1,4 +1,10 @@
-import { withSession, failure, errorMessage, refSelector, refNumber } from "./_helpers.js";
+import {
+  withSession,
+  failure,
+  errorMessage,
+  refSelector,
+  refNumber,
+} from "./_helpers.js";
 import type { ActionResult, TypeResult } from "../types.js";
 import { getConfig } from "../config.js";
 
@@ -9,7 +15,9 @@ export interface TypeInput {
   taskId?: string;
 }
 
-export async function browserType(input: TypeInput): Promise<ActionResult<TypeResult>> {
+export async function browserType(
+  input: TypeInput,
+): Promise<ActionResult<TypeResult>> {
   if (!input.ref) return failure("ref is required");
   if (typeof input.text !== "string") return failure("text is required");
   let selector: string;
@@ -30,11 +38,15 @@ export async function browserType(input: TypeInput): Promise<ActionResult<TypeRe
           `Element @e${n} not found. Page may have changed; call browser_snapshot to refresh refs.`,
         );
       }
-      await locator.scrollIntoViewIfNeeded({ timeout: cfg.commandTimeoutMs }).catch(() => undefined);
+      await locator
+        .scrollIntoViewIfNeeded({ timeout: cfg.commandTimeoutMs })
+        .catch(() => undefined);
       await locator.fill(input.text, { timeout: cfg.commandTimeoutMs });
       if (input.submit) {
         await locator.press("Enter", { timeout: cfg.commandTimeoutMs });
-        await session.page.waitForLoadState("domcontentloaded", { timeout: 5000 }).catch(() => undefined);
+        await session.page
+          .waitForLoadState("domcontentloaded", { timeout: 5000 })
+          .catch(() => undefined);
       }
       return {
         success: true,

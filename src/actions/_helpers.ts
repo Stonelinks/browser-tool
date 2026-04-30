@@ -18,7 +18,9 @@ export function refSelector(rawRef: string): string {
   const trimmed = rawRef.trim();
   const match = trimmed.match(/^@?e?(\d+)$/i);
   if (!match) {
-    throw new Error(`Invalid ref "${rawRef}". Expected formats: "@e5", "e5", or "5".`);
+    throw new Error(
+      `Invalid ref "${rawRef}". Expected formats: "@e5", "e5", or "5".`,
+    );
   }
   return `[data-agent-ref="${match[1]}"]`;
 }
@@ -27,7 +29,9 @@ export function refNumber(rawRef: string): string {
   const trimmed = rawRef.trim();
   const match = trimmed.match(/^@?e?(\d+)$/i);
   if (!match) {
-    throw new Error(`Invalid ref "${rawRef}". Expected formats: "@e5", "e5", or "5".`);
+    throw new Error(
+      `Invalid ref "${rawRef}". Expected formats: "@e5", "e5", or "5".`,
+    );
   }
   return match[1] as string;
 }

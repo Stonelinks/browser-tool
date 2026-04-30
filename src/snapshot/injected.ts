@@ -44,7 +44,16 @@ export function snapshotScript(opts: SnapshotOptions): SnapshotPayload {
     "searchbox",
     "slider",
   ]);
-  const STRUCTURAL_TAGS = new Set(["HEADER", "NAV", "MAIN", "ASIDE", "FOOTER", "SECTION", "ARTICLE", "FORM"]);
+  const STRUCTURAL_TAGS = new Set([
+    "HEADER",
+    "NAV",
+    "MAIN",
+    "ASIDE",
+    "FOOTER",
+    "SECTION",
+    "ARTICLE",
+    "FORM",
+  ]);
   const TEXTUAL_TAGS = new Set(["H1", "H2", "H3", "H4", "H5", "H6", "P", "LI"]);
 
   function isVisible(el: Element): boolean {
@@ -76,7 +85,8 @@ export function snapshotScript(opts: SnapshotOptions): SnapshotPayload {
         const type = ((el as HTMLInputElement).type || "text").toLowerCase();
         if (type === "checkbox") return "checkbox";
         if (type === "radio") return "radio";
-        if (type === "submit" || type === "button" || type === "reset") return "button";
+        if (type === "submit" || type === "button" || type === "reset")
+          return "button";
         if (type === "search") return "searchbox";
         return "textbox";
       }
@@ -154,9 +164,18 @@ export function snapshotScript(opts: SnapshotOptions): SnapshotPayload {
       return "";
     }
     if (tag === "IMG") {
-      return clean((el as HTMLImageElement).alt) || clean((el as HTMLImageElement).title);
+      return (
+        clean((el as HTMLImageElement).alt) ||
+        clean((el as HTMLImageElement).title)
+      );
     }
-    if (tag === "A" || tag === "BUTTON" || tag === "SUMMARY" || tag === "OPTION" || tag === "LABEL") {
+    if (
+      tag === "A" ||
+      tag === "BUTTON" ||
+      tag === "SUMMARY" ||
+      tag === "OPTION" ||
+      tag === "LABEL"
+    ) {
       return clean(el.textContent);
     }
     if (tag.startsWith("H") && tag.length === 2) return clean(el.textContent);
@@ -167,12 +186,19 @@ export function snapshotScript(opts: SnapshotOptions): SnapshotPayload {
     const parts: string[] = [];
     const tag = el.tagName;
     const inp = el as HTMLInputElement;
-    if ((tag === "INPUT" || tag === "BUTTON" || tag === "TEXTAREA" || tag === "SELECT") && inp.disabled) {
+    if (
+      (tag === "INPUT" ||
+        tag === "BUTTON" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT") &&
+      inp.disabled
+    ) {
       parts.push("disabled");
     }
     if (tag === "INPUT") {
       const type = (inp.type || "").toLowerCase();
-      if ((type === "checkbox" || type === "radio") && inp.checked) parts.push("checked");
+      if ((type === "checkbox" || type === "radio") && inp.checked)
+        parts.push("checked");
     }
     const ariaExpanded = el.getAttribute("aria-expanded");
     if (ariaExpanded != null) parts.push(`expanded=${ariaExpanded}`);
@@ -180,7 +206,8 @@ export function snapshotScript(opts: SnapshotOptions): SnapshotPayload {
     if (ariaSelected === "true") parts.push("selected");
     const ariaPressed = el.getAttribute("aria-pressed");
     if (ariaPressed != null) parts.push(`pressed=${ariaPressed}`);
-    if (tag === "DETAILS" && (el as HTMLDetailsElement).open) parts.push("open");
+    if (tag === "DETAILS" && (el as HTMLDetailsElement).open)
+      parts.push("open");
     if (parts.length === 0) return "";
     return ` [${parts.join(", ")}]`;
   }
@@ -221,7 +248,13 @@ export function snapshotScript(opts: SnapshotOptions): SnapshotPayload {
   function walk(el: Element, depth: number): void {
     if (!(el instanceof Element)) return;
     const tag = el.tagName;
-    if (tag === "SCRIPT" || tag === "STYLE" || tag === "NOSCRIPT" || tag === "META" || tag === "LINK") {
+    if (
+      tag === "SCRIPT" ||
+      tag === "STYLE" ||
+      tag === "NOSCRIPT" ||
+      tag === "META" ||
+      tag === "LINK"
+    ) {
       return;
     }
     if (!isVisible(el)) {

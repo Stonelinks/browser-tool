@@ -1,4 +1,10 @@
-import { withSession, failure, errorMessage, refSelector, refNumber } from "./_helpers.js";
+import {
+  withSession,
+  failure,
+  errorMessage,
+  refSelector,
+  refNumber,
+} from "./_helpers.js";
 import type { ActionResult, ClickResult } from "../types.js";
 import { getConfig } from "../config.js";
 
@@ -7,7 +13,9 @@ export interface ClickInput {
   taskId?: string;
 }
 
-export async function browserClick(input: ClickInput): Promise<ActionResult<ClickResult>> {
+export async function browserClick(
+  input: ClickInput,
+): Promise<ActionResult<ClickResult>> {
   if (!input.ref) return failure("ref is required");
   let selector: string;
   let n: string;
@@ -27,10 +35,14 @@ export async function browserClick(input: ClickInput): Promise<ActionResult<Clic
           `Element @e${n} not found. Page may have changed; call browser_snapshot to refresh refs.`,
         );
       }
-      await locator.scrollIntoViewIfNeeded({ timeout: cfg.commandTimeoutMs }).catch(() => undefined);
+      await locator
+        .scrollIntoViewIfNeeded({ timeout: cfg.commandTimeoutMs })
+        .catch(() => undefined);
       await locator.click({ timeout: cfg.commandTimeoutMs });
       // Allow any client-side navigation to settle
-      await session.page.waitForLoadState("domcontentloaded", { timeout: 5000 }).catch(() => undefined);
+      await session.page
+        .waitForLoadState("domcontentloaded", { timeout: 5000 })
+        .catch(() => undefined);
       return {
         success: true,
         clicked: `@e${n}`,

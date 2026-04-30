@@ -5,10 +5,15 @@ export interface BackInput {
   taskId?: string;
 }
 
-export async function browserBack(input: BackInput = {}): Promise<ActionResult<BackResult>> {
+export async function browserBack(
+  input: BackInput = {},
+): Promise<ActionResult<BackResult>> {
   return withSession(input.taskId, async (session) => {
     try {
-      const resp = await session.page.goBack({ waitUntil: "domcontentloaded", timeout: 10000 });
+      const resp = await session.page.goBack({
+        waitUntil: "domcontentloaded",
+        timeout: 10000,
+      });
       if (resp === null) {
         return failure("nothing to go back to (no prior history)");
       }

@@ -7,9 +7,13 @@ export interface ScrollInput {
   taskId?: string;
 }
 
-export async function browserScroll(input: ScrollInput): Promise<ActionResult<ScrollResult>> {
+export async function browserScroll(
+  input: ScrollInput,
+): Promise<ActionResult<ScrollResult>> {
   if (input.direction !== "up" && input.direction !== "down") {
-    return failure(`invalid direction "${input.direction}"; expected "up" or "down"`);
+    return failure(
+      `invalid direction "${input.direction}"; expected "up" or "down"`,
+    );
   }
   const pixels = input.pixels ?? 600;
   return withSession(input.taskId, async (session) => {
