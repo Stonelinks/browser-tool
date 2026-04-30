@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+cd $PROJECT_ROOT
+
+source env.sh
+
+echo "=== format ==="
+format
+
+echo "=== typecheck ==="
+typecheck
+
+echo "=== test ==="
+"$PROJECT_ROOT/bin/test"
+
+echo "=== test-integration ==="
+"$PROJECT_ROOT/bin/test-integration"
