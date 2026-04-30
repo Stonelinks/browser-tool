@@ -268,7 +268,7 @@ if (v.success) console.log(v.analysis);
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| `BROWSER_TOOL_VISION_BASE_URL` | `http://localhost:4000/flex/v1` | Base URL for the vision API (Anthropic Messages API compatible). Change the path prefix to switch completion windows (e.g. `/asap/v1`, `/standard/v1`, `/priority/v1`). |
+| `BROWSER_TOOL_VISION_BASE_URL` | `http://localhost:4000/flex` | Base URL for the vision API (Anthropic SDK appends `/v1/messages` automatically). Change the path prefix to switch completion windows (e.g. `/asap`, `/standard`, `/priority`). |
 | `BROWSER_TOOL_VISION_MODEL` | `moonshotai/Kimi-K2.5` | Override the vision model. |
 | `BROWSER_TOOL_CACHE_DIR` | `~/.cache/browser-tool` | Where screenshots and runtime artifacts live. |
 | `BROWSER_INACTIVITY_TIMEOUT` | `300` (seconds) | Idle session reaper threshold. |
@@ -298,6 +298,6 @@ if (v.success) console.log(v.analysis);
 
 **Chromium fails to launch** — make sure you ran `bunx playwright install chromium`. On Linux with limited `/dev/shm`, the launch flags include `--disable-dev-shm-usage`; if you've added other flags, that may conflict.
 
-**Vision call fails with connection error** — make sure an Anthropic-compatible API is reachable at `BROWSER_TOOL_VISION_BASE_URL` (default `http://localhost:4000/flex/v1`).
+**Vision call fails with connection error** — make sure an Anthropic-compatible API is reachable at `BROWSER_TOOL_VISION_BASE_URL` (default `http://localhost:4000/flex`).
 
 **Sessions don't close on Ctrl-C in the MCP server** — they should; lifecycle handlers register `SIGINT`/`SIGTERM`. If your client wraps the server, make sure the wrapper forwards signals.
