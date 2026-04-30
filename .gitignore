@@ -25,3 +25,6 @@ yarn-debug.log*
 # Browser-tool runtime
 .browser-tool-cache/
 screenshots/
+
+# Task planning
+TODO.md
