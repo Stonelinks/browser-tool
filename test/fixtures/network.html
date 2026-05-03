@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><title>Network Test</title></head>
+<body>
+<script>
+// Fetch requests for testing network capture
+fetch('/api/json-endpoint')
+  .then(r => r.text())
+  .catch(() => {});
+
+fetch('/api/text-endpoint')
+  .then(r => r.text())
+  .catch(() => {});
+
+// XHR request
+var xhr = new XMLHttpRequest();
+xhr.open('POST', '/api/post-endpoint');
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.send(JSON.stringify({ key: 'value' }));
+
+// Request that will 404
+fetch('/api/not-found')
+  .then(r => r.text())
+  .catch(() => {});
+</script>
+</body>
+</html>

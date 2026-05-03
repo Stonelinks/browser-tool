@@ -8,6 +8,7 @@ export { browserPress, type PressInput } from "./actions/press.js";
 export { browserConsole, type ConsoleInput } from "./actions/console.js";
 export { browserGetImages, type GetImagesInput } from "./actions/getImages.js";
 export { browserVision, type VisionInput } from "./actions/vision.js";
+export { browserNetwork, type NetworkInput } from "./actions/network.js";
 
 export { SessionManager } from "./session/manager.js";
 export { Session } from "./session/session.js";
@@ -36,6 +37,8 @@ export type {
   PressResult,
   ConsoleBuffersResult,
   ConsoleEvalResult,
+  NetworkRequest,
+  NetworkResult,
   GetImagesResult,
   VisionResult,
 } from "./types.js";

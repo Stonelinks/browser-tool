@@ -22,6 +22,7 @@
  *   POST /back          — { task_id? }
  *   POST /press         — { key, task_id? }
  *   POST /console       — { clear?, expression?, task_id? }
+ *   POST /network       — { clear?, filter?, task_id? }
  *   POST /get-images    — { task_id? }
  *   POST /vision        — { question, annotate?, model?, task_id? }
  */
@@ -36,6 +37,7 @@ import { browserPress } from "./actions/press.js";
 import { browserConsole } from "./actions/console.js";
 import { browserGetImages } from "./actions/getImages.js";
 import { browserVision } from "./actions/vision.js";
+import { browserNetwork } from "./actions/network.js";
 import { SessionManager } from "./session/manager.js";
 import { logError, logDebug } from "./logger.js";
 import { createDaemonHandler, type ActionHandler } from "./daemon-handler.js";
@@ -92,6 +94,19 @@ const actions: Record<string, ActionHandler> = {
       question: b.question as string,
       annotate: b.annotate as boolean | undefined,
       model: b.model as string | undefined,
+      taskId: b.task_id as string | undefined,
+    }) as any,
+  network: async (b) =>
+    browserNetwork({
+      clear: b.clear as boolean | undefined,
+      filter: b.filter as
+        | {
+            url_pattern?: string;
+            resource_type?: string;
+            method?: string;
+            status_code?: number;
+          }
+        | undefined,
       taskId: b.task_id as string | undefined,
     }) as any,
 };

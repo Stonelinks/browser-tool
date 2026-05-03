@@ -9,6 +9,7 @@ import { browserPress } from "./actions/press.js";
 import { browserConsole } from "./actions/console.js";
 import { browserGetImages } from "./actions/getImages.js";
 import { browserVision } from "./actions/vision.js";
+import { browserNetwork } from "./actions/network.js";
 import type { ActionResult } from "./types.js";
 
 const taskId = z
@@ -82,6 +83,40 @@ export const ConsoleSchema = z.object({
   task_id: taskId,
 });
 export const GetImagesSchema = z.object({ task_id: taskId });
+export const NetworkSchema = z.object({
+  clear: z
+    .boolean()
+    .optional()
+    .describe("If true, clear the network buffer after returning the requests."),
+  filter: z
+    .object({
+      url_pattern: z
+        .string()
+        .optional()
+        .describe(
+          "Regex pattern to filter requests by URL. Only matching requests are returned.",
+        ),
+      resource_type: z
+        .string()
+        .optional()
+        .describe(
+          'Filter by resource type, e.g. "document", "xhr", "fetch", "script", "stylesheet", "image".',
+        ),
+      method: z
+        .string()
+        .optional()
+        .describe('Filter by HTTP method, e.g. "GET", "POST".'),
+      status_code: z
+        .number()
+        .int()
+        .optional()
+        .describe("Filter by HTTP status code, e.g. 200, 404, 500."),
+    })
+    .optional()
+    .describe("Optional filters to narrow down which network requests are returned."),
+  task_id: taskId,
+});
+
 export const VisionSchema = z.object({
   question: z
     .string()
@@ -228,6 +263,26 @@ export const TOOL_SPECS: ToolSpec[] = [
         question: a.question,
         annotate: a.annotate,
         model: a.model,
+        taskId: a.task_id,
+      }),
+    ),
+  },
+  {
+    name: "browser_network",
+    description:
+      "Read captured network requests (HTTP request/response pairs). Returns URL, method, status, headers, and response bodies for text-based content types. Supports filtering by URL pattern, resource type, method, and status code. Useful for debugging API calls, inspecting AJAX requests, and diagnosing network issues.",
+    inputSchema: NetworkSchema,
+    handler: adapt(NetworkSchema, (a) =>
+      browserNetwork({
+        clear: a.clear,
+        filter: a.filter as
+          | {
+              url_pattern?: string;
+              resource_type?: string;
+              method?: string;
+              status_code?: number;
+            }
+          | undefined,
         taskId: a.task_id,
       }),
     ),

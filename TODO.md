@@ -1,65 +1,47 @@
 # TODO
 
 ## Goal
-Adapt the sailresearch-proxy `bin/` + `env.sh` pattern to browser-tool, giving us `check`, `format`, `format-ts`, `format-shell`, `typecheck`, `test`, and `test-integration` scripts that run formatting, type checking, unit tests, and integration/E2E tests.
+Add network request monitoring (with response bodies and filtering) as a new daemon action, and restructure SKILL.md to clearly separate general browsing from software-engineering debugging capabilities.
 
 ## Tasks
 
-### 1. Add prettier as a devDependency
-- [x] Add `prettier` to `devDependencies` in `package.json`
-- [x] Run `bun install` to update lockfile
+### 1. Add NetworkRequest type to `src/types.ts`
+- [x] Add `NetworkRequest` interface with fields: url, method, status, content_type, size, duration_ms, resource_type, request_headers, response_headers, body, body_truncated, timestamp
+- [x] Add `NetworkResult` interface with fields: requests, total, filtered
 
-### 2. Create `env.sh`
-- [x] Create `env.sh` at project root (sourced, not executed) that sets `PROJECT_ROOT`, adds `bin/` and `node_modules/.bin` to `PATH`, and makes `bin/*` executable
+### 2. Add network interception to Session (`src/session/session.ts`)
+- [x] Add `networkBuffer: NetworkRequest[]` with a cap (500 entries)
+- [x] Listen to `page.on('response')` to capture request/response pairs
+- [x] Capture response bodies for text-based content types only (skip images, fonts, media, etc.)
+- [x] Truncate bodies over 100KB and set `body_truncated: true`
+- [x] Add `clearNetworkBuffer()` method
+- [x] Extend `clearBuffers()` to also clear network buffer
 
-### 3. Create `bin/format-ts`
-- [x] Format TS files with `prettier --write 'src/**/*.ts'` (accept optional file args)
+### 3. Create network action (`src/actions/network.ts`)
+- [x] Accept optional `clear`, `filter.url_pattern` (regex), `filter.resource_type`, `filter.method`, `filter.status_code`, `task_id`
+- [x] Return buffered network requests, applying filters
+- [x] Support `clear: true` to empty buffer after returning
 
-### 4. Create `bin/format-shell`
-- [x] Auto-detect bash scripts from git tracked/untracked files (first-line `bash` check) and run `shfmt -l -w` on them
+### 4. Register network action in schema and daemon
+- [x] Add `NetworkSchema` to `src/schema.ts` with Zod validation
+- [x] Add `browser_network` tool spec to `TOOL_SPECS` array
+- [x] Export `browserNetwork` from `src/index.ts`
+- [x] Register `/network` endpoint in `src/daemon.ts`
 
-### 5. Create `bin/format`
-- [x] Compose `format-ts` + `format-shell`
+### 5. Add tests (`test/network.test.ts`)
+- [x] Create test fixture HTML that triggers fetch/XHR requests
+- [x] Test that network requests are captured with status, body, headers
+- [x] Test filtering by resource_type and url_pattern
+- [x] Test clear empties the buffer
 
-### 6. Create `bin/typecheck`
-- [x] Run `bunx tsc --noEmit`
-
-### 7. Create `bin/test`
-- [x] Run `bun test --timeout 30000 --parallel "$@"`
-
-### 8. Create `bin/test-integration`
-- [x] Verify `BROWSER_TOOL_VISION_BASE_URL` is reachable (warn but continue if not)
-- [x] Test the library entrypoint: `bun run eval/e2e.ts`
-- [x] Test the CLI entrypoint: run `browser-tool navigate --url <fixture>` and verify JSON output
-- [x] Test the MCP server entrypoint: send JSON-RPC `initialize` + `tools/list` and verify 10 tools
-- [x] Print PASS/FAIL summary
-
-### 9. Create `bin/check`
-- [x] Run `format`, `typecheck`, `test`, `test-integration` in sequence (set -e)
-
-### 10. Make all bin scripts executable
-- [x] `chmod +x bin/* env.sh`
-
-### 11. Update documentation
-- [x] Add `bin/` scripts section to `README.md` (prefer bin scripts over npm scripts)
-- [x] Add `bin/` to `.gitignore` exemption if needed
-- [x] Update `docs/developers.md` with bin/check workflow
-
-## Discovered Tasks
-
-### 12. Fix visionBaseUrl double /v1 bug
-
-The Anthropic SDK automatically appends `/v1/messages` to `baseURL`. With the current default
-`http://localhost:4000/flex/v1`, the actual request goes to `/flex/v1/v1/messages` → 404.
-
-- [x] Change `src/config.ts` default `visionBaseUrl` from `http://localhost:4000/flex/v1` to `http://localhost:4000/flex`
-- [x] Update `.env`: `BROWSER_TOOL_VISION_BASE_URL=http://localhost:4000/flex`
-- [x] Update `README.md` config table
-- [x] Update `docs/users.md` references
-- [x] Verify `eval/e2e.ts` vision step passes
+### 6. Update SKILL.md with debugging section
+- [x] Add clearly separated "Debugging & Development" section after the main workflow
+- [x] Document `/network` action with all filter options and examples
+- [x] Prominently feature `/console` for logs/errors/JS eval in the debugging section
+- [x] Add guidance that debugging features are only needed for software engineering, not general browsing
+- [x] Keep general browsing section unchanged
 
 ## Notes
-- Follow the sailresearch-proxy pattern exactly: `source env.sh` from each script, scripts call each other by name via PATH.
-- Direct all agents and humans to prefer bin scripts over `bun run` npm scripts.
-- `test-integration` must exercise all three entrypoints: library (eval/e2e.ts), CLI, and MCP server.
-- Shell formatting (`shfmt`) is included for future-proofing even though there are no shell scripts yet.
+- Response body capture is limited to text-based content types and truncated at 100KB to avoid memory issues
+- The `/console` action already supports JS expression evaluation — no new `/execute` endpoint needed
+- Network filtering happens at read time (not capture time), so all requests are always buffered

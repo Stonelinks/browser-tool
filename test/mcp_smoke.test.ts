@@ -77,7 +77,7 @@ test("MCP server lists 10 tools and handles a real navigate call", async () => {
     const list = await readResponse(proc.stdout as unknown as ReadableStream<Uint8Array>, 2);
     expect(list.result).toBeDefined();
     const tools = (list.result as { tools: Array<{ name: string; inputSchema: unknown }> }).tools;
-    expect(tools.length).toBe(10);
+    expect(tools.length).toBe(11);
     const names = tools.map((t) => t.name).sort();
     expect(names).toEqual(
       [
@@ -85,6 +85,7 @@ test("MCP server lists 10 tools and handles a real navigate call", async () => {
         "browser_click",
         "browser_console",
         "browser_get_images",
+        "browser_network",
         "browser_navigate",
         "browser_press",
         "browser_scroll",

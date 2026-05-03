@@ -216,7 +216,7 @@ describe("daemon handler", () => {
     expect(body.ok).toBe(true);
   });
 
-  test("all 10 action names are routed correctly", async () => {
+  test("all 11 action names are routed correctly", async () => {
     const actionNames = [
       "navigate",
       "snapshot",
@@ -228,6 +228,7 @@ describe("daemon handler", () => {
       "console",
       "get-images",
       "vision",
+      "network",
     ];
 
     const calls: Record<string, Record<string, unknown>> = {};

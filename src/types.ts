@@ -76,6 +76,27 @@ export interface ConsoleEvalResult {
   result_type: string;
 }
 
+export interface NetworkRequest {
+  url: string;
+  method: string;
+  status: number;
+  content_type: string;
+  size: number;
+  duration_ms: number;
+  resource_type: string;
+  request_headers: Record<string, string>;
+  response_headers: Record<string, string>;
+  body?: string;
+  body_truncated?: boolean;
+  timestamp: number;
+}
+
+export interface NetworkResult {
+  requests: NetworkRequest[];
+  total: number;
+  filtered: number;
+}
+
 export interface GetImagesResult {
   images: ImageInfo[];
   count: number;

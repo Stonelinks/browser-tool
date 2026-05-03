@@ -27,6 +27,26 @@ export async function startFixtureServer(): Promise<FixtureServer> {
     async fetch(req) {
       const u = new URL(req.url);
       const path = u.pathname;
+      // API endpoints for network tests
+      if (path === "/api/json-endpoint") {
+        return new Response(JSON.stringify({ message: "hello", count: 42 }), {
+          headers: { "content-type": "application/json" },
+        });
+      }
+      if (path === "/api/text-endpoint") {
+        return new Response("plain text response", {
+          headers: { "content-type": "text/plain" },
+        });
+      }
+      if (path === "/api/post-endpoint" && req.method === "POST") {
+        const body = await req.text();
+        return new Response(JSON.stringify({ received: true, body }), {
+          headers: { "content-type": "application/json" },
+        });
+      }
+      if (path === "/api/not-found") {
+        return new Response("not found", { status: 404 });
+      }
       // /results returns a results page reflecting the q param.
       if (path === "/results") {
         const q = u.searchParams.get("q") ?? "";
