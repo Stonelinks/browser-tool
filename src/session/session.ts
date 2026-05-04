@@ -50,9 +50,8 @@ export class Session {
 
   private attachPageListeners(page: Page): void {
     page.on("console", (msg: PWConsoleMessage) => {
-      if (this.consoleBuffer.length >= Session.CONSOLE_BUFFER_LIMIT) this.consoleBuffer.shift();
       const loc = msg.location();
-      this.consoleBuffer.push({
+      this.pushConsole({
         type: msg.type(),
         text: msg.text(),
         location: loc.url
@@ -62,8 +61,7 @@ export class Session {
       });
     });
     page.on("pageerror", (err: Error) => {
-      if (this.errorBuffer.length >= Session.ERROR_BUFFER_LIMIT) this.errorBuffer.shift();
-      this.errorBuffer.push({
+      this.pushError({
         message: err.message,
         stack: err.stack,
         timestamp: Date.now(),
@@ -77,8 +75,6 @@ export class Session {
   }
 
   private async captureNetworkEntry(response: PWResponse): Promise<void> {
-    if (this.networkBuffer.length >= Session.NETWORK_BUFFER_LIMIT) this.networkBuffer.shift();
-
     const request = response.request();
     const contentType = response.headers()["content-type"] ?? "";
     const url = response.url();
@@ -116,7 +112,7 @@ export class Session {
       }
     }
 
-    this.networkBuffer.push(entry);
+    this.pushNetwork(entry);
   }
 
   private computeDuration(request: import("playwright-core").Request): number {
@@ -133,18 +129,45 @@ export class Session {
     return Session.TEXT_CONTENT_TYPES.some((prefix) => lower.includes(prefix));
   }
 
+  pushConsole(msg: ConsoleMessage): void {
+    if (this.consoleBuffer.length >= Session.CONSOLE_BUFFER_LIMIT) this.consoleBuffer.shift();
+    this.consoleBuffer.push(msg);
+  }
+
+  pushError(err: JsError): void {
+    if (this.errorBuffer.length >= Session.ERROR_BUFFER_LIMIT) this.errorBuffer.shift();
+    this.errorBuffer.push(err);
+  }
+
+  pushNetwork(entry: NetworkRequest): void {
+    if (this.networkBuffer.length >= Session.NETWORK_BUFFER_LIMIT) this.networkBuffer.shift();
+    this.networkBuffer.push(entry);
+  }
+
+  clearConsoleBuffer(): void {
+    this.consoleBuffer = [];
+  }
+
+  clearErrorBuffer(): void {
+    this.errorBuffer = [];
+  }
+
+  clearNetworkBufferInternal(): void {
+    this.networkBuffer = [];
+  }
+
   touch(): void {
     this.lastActivityAt = Date.now();
   }
 
   clearBuffers(): void {
-    this.consoleBuffer = [];
-    this.errorBuffer = [];
-    this.networkBuffer = [];
+    this.clearConsoleBuffer();
+    this.clearErrorBuffer();
+    this.clearNetworkBufferInternal();
   }
 
   clearNetworkBuffer(): void {
-    this.networkBuffer = [];
+    this.clearNetworkBufferInternal();
   }
 
   async close(): Promise<void> {

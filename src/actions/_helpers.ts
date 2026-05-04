@@ -9,9 +9,20 @@ export async function withSession<T>(
 ): Promise<T> {
   const cfg = getConfig();
   const id = taskId ?? cfg.defaultTaskId;
-  const session = await SessionManager.getInstance().getOrCreate(id);
-  session.touch();
-  return fn(session);
+  return SessionManager.getInstance().runExclusive(id, async () => {
+    try {
+      const session = await SessionManager.getInstance().getOrCreate(id);
+      session.touch();
+      return fn(session);
+    } catch (err) {
+      // If the error is a session limit error, convert to a failure result
+      // if the return type supports it; otherwise rethrow.
+      if (err instanceof Error && err.message.includes("Session limit reached")) {
+        return { success: false, error: err.message } as T;
+      }
+      throw err;
+    }
+  });
 }
 
 export function refSelector(rawRef: string): string {

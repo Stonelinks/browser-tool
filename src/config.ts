@@ -12,6 +12,7 @@ export interface Config {
   defaultTaskId: string;
   commandTimeoutMs: number;
   maxSnapshotChars: number;
+  maxSessions: number;
   debug: boolean;
 }
 
@@ -48,6 +49,7 @@ export function getConfig(): Config {
     defaultTaskId: "default",
     commandTimeoutMs: envInt("BROWSER_COMMAND_TIMEOUT", 30) * 1000,
     maxSnapshotChars: envInt("BROWSER_MAX_SNAPSHOT_CHARS", 8000),
+    maxSessions: envInt("BROWSER_MAX_SESSIONS", 20),
     debug: envBool("BROWSER_TOOL_DEBUG", false),
   };
   return cached;

@@ -16,7 +16,11 @@ export interface VisionInput {
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
+let pruning = false;
+
 async function pruneOldScreenshots(dir: string): Promise<void> {
+  if (pruning) return;
+  pruning = true;
   try {
     const entries = await readdir(dir);
     const now = Date.now();
@@ -35,6 +39,8 @@ async function pruneOldScreenshots(dir: string): Promise<void> {
     );
   } catch {
     // dir may not exist yet
+  } finally {
+    pruning = false;
   }
 }
 
